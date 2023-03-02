@@ -5,6 +5,8 @@
 
 #include "filereader.h"
 
+const int WINDOW_SIZE = 1000;
+
 int main(int argc, char* argv[]) {
 
 
@@ -21,10 +23,35 @@ int main(int argc, char* argv[]) {
 
     // Figure out the dimensions of the grid
 
+    // Create a window
+    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "PLC Renderer", sf::Style::Titlebar | sf::Style::Close);
+
+    int gridSize = line.length();
     // Dynamically create the SFML objects
 
-    // Create a window
-    sf::Window window(sf::VideoMode(800, 800), "SFML Boilerplate");
+    int tileSize = WINDOW_SIZE / gridSize;
+
+    sf::RectangleShape tiles[gridSize][gridSize];
+
+    for (int y = 0; y < gridSize; y++) {
+        for (int x = 0; x < gridSize; x++) {
+            tiles[x][y].setPosition(sf::Vector2f(x * tileSize, y * tileSize));
+            tiles[x][y].setSize(sf::Vector2f(tileSize, tileSize));
+
+            if(line.at(x) == '0') {
+                tiles[x][y].setFillColor(sf::Color::White);
+            } else {
+                tiles[x][y].setFillColor(sf::Color::Black);
+            }
+        }
+
+        // If we run out of lines, exit this for loop
+        if (!fReader->readLine(&line)) {
+            break;
+        }
+    }
+
+    
 
     // Handle closing the window
     while(window.isOpen()) {
@@ -35,6 +62,15 @@ int main(int argc, char* argv[]) {
             if (Event.type == sf::Event::KeyPressed) {
                 if (Event.key.code == sf::Keyboard::Escape)
                     window.close();
+                if (Event.key.code == sf::Keyboard::R) {
+                    
+                }
+            }
+        }
+        window.clear(sf::Color::Blue);
+        for (int y = 0; y < gridSize; y++) {
+            for (int x = 0; x < gridSize; x++) {
+                window.draw(tiles[x][y]);
             }
         }
         window.display();
