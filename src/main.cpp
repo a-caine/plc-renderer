@@ -14,6 +14,8 @@ int main(int argc, char* argv[]) {
     std::string input_path = argv[1];
     std::string line;
 
+    std::cout << input_path << std::endl;
+
     FileReader *fReader = new FileReader(input_path);
 
     if (!fReader->readLine(&line)) {
