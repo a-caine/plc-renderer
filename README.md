@@ -7,10 +7,16 @@ Renders the tile input and output from COMP2212 (Programming Language Concepts)
 
 ## Usage:
 
-Make sure that you are in the build directory.
+From the root directory of the project, make a new directory to store the cmake files (e.g. build)
 
-Build the project with cmake:
+Enter the newly created directory and make the cmake files:
+```cmake ..```
+
+Then build the project with cmake:
 ```cmake --build .```
 
 Once you have built the program, run it with the tile output file as a command line argument:
 ```./PCLRenderer /path/to/file```
+
+## Dependencies
+This project requires SFML to work, you can find instructions on how to install SFML ![here](https://github.com/SFML/SFML).
