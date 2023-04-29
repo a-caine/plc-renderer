@@ -5,7 +5,7 @@
 
 #include "filereader.h"
 
-const int WINDOW_SIZE = 1000;
+const int WINDOW_SIZE = 800;
 
 int main(int argc, char* argv[]) {
 
@@ -18,42 +18,49 @@ int main(int argc, char* argv[]) {
 
     FileReader *fReader = new FileReader(input_path);
 
+    // If there are no lines in the file then return an errors
     if (!fReader->readLine(&line)) {
         std::cerr << "Invalid file!" << std::endl;
         return -1;
     }
 
-    // Figure out the dimensions of the grid
+    // Otherwise read the lines into a vector of bools
+    int outputWidth = line.length();
+    int outputHeight = 1;
+
+    std::vector<bool*> tiles;
+
+    tiles.push_back((bool*)calloc(outputWidth, sizeof(bool)));
+
+    for (int cx = 0; cx < outputWidth; cx++) {
+        if(line.at(cx) == '0') {
+            tiles.at(0)[cx] = false;
+        } else {
+            tiles.at(0)[cx] = true;
+        }
+    }
 
     // Create a window
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "PLC Renderer", sf::Style::Titlebar | sf::Style::Close);
 
-    int gridSize = line.length();
-    // Dynamically create the SFML objects
+    int tileSize = WINDOW_SIZE / std::max(outputHeight, outputWidth);
 
-    int tileSize = WINDOW_SIZE / gridSize;
+    while (fReader->readLine(&line)) {
+        tiles.push_back((bool*)calloc(outputWidth, sizeof(bool)));
 
-    sf::RectangleShape tiles[gridSize][gridSize];
-
-    for (int y = 0; y < gridSize; y++) {
-        for (int x = 0; x < gridSize; x++) {
-            tiles[x][y].setPosition(sf::Vector2f(x * tileSize, y * tileSize));
-            tiles[x][y].setSize(sf::Vector2f(tileSize, tileSize));
-
-            if(line.at(x) == '0') {
-                tiles[x][y].setFillColor(sf::Color::White);
+        for (int cx = 0; cx < outputWidth; cx++) {
+            if(line.at(cx) == '0') {
+                tiles.at(outputHeight)[cx] = false;
             } else {
-                tiles[x][y].setFillColor(sf::Color::Black);
+                tiles.at(outputHeight)[cx] = true;
             }
         }
 
-        // If we run out of lines, exit this for loop
-        if (!fReader->readLine(&line)) {
-            break;
-        }
+        outputHeight++;
     }
 
-    
+    sf::RectangleShape tile;
+    tile.setSize(sf::Vector2f(tileSize, tileSize));
 
     // Handle closing the window
     while(window.isOpen()) {
@@ -70,9 +77,15 @@ int main(int argc, char* argv[]) {
             }
         }
         window.clear(sf::Color::Blue);
-        for (int y = 0; y < gridSize; y++) {
-            for (int x = 0; x < gridSize; x++) {
-                window.draw(tiles[x][y]);
+        for (int y = 0; y < outputHeight; y++) {
+            for (int x = 0; x < outputWidth; x++) {
+                tile.setPosition(sf::Vector2f(x * tileSize, y * tileSize));
+                if (tiles[x][y]) {
+                    tile.setFillColor(sf::Color::Black);
+                } else {
+                    tile.setFillColor(sf::Color::White);
+                }
+                window.draw(tile);
             }
         }
         window.display();
