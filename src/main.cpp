@@ -39,11 +39,12 @@ int main(int argc, char* argv[]) {
             tiles.at(0)[cx] = true;
         }
     }
+    
 
     // Create a window
-    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "PLC Renderer", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Tile Renderer", sf::Style::Titlebar | sf::Style::Close);
 
-    int tileSize = WINDOW_SIZE / std::max(outputHeight, outputWidth);
+    
 
     while (fReader->readLine(&line)) {
         tiles.push_back((bool*)calloc(outputWidth, sizeof(bool)));
@@ -57,6 +58,14 @@ int main(int argc, char* argv[]) {
         }
 
         outputHeight++;
+    }
+
+    int tileSize;
+
+    if (outputHeight > outputWidth) {
+        tileSize = WINDOW_SIZE / outputHeight;
+    } else {
+        tileSize = WINDOW_SIZE / outputWidth;
     }
 
     sf::RectangleShape tile;
@@ -80,7 +89,7 @@ int main(int argc, char* argv[]) {
         for (int y = 0; y < outputHeight; y++) {
             for (int x = 0; x < outputWidth; x++) {
                 tile.setPosition(sf::Vector2f(x * tileSize, y * tileSize));
-                if (tiles[x][y]) {
+                if (tiles[y][x]) {
                     tile.setFillColor(sf::Color::Black);
                 } else {
                     tile.setFillColor(sf::Color::White);
